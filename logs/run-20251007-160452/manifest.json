@@ -1,0 +1,219 @@
+{
+  "run_started_utc": "2025-10-07T20:04:52.533902+00:00",
+  "run_finished_utc": "2025-10-07T20:05:01.609786+00:00",
+  "elapsed_sec": 9.075,
+  "mode": "execute",
+  "settings": {
+    "bitrate_mode": "CBR320",
+    "sample_rate": "44100",
+    "delete_mode": "trash",
+    "replace_in_place": true,
+    "collision": "overwrite"
+  },
+  "inputs": [
+    "input_samples\\AlbumA"
+  ],
+  "summary": {
+    "total": 14,
+    "ok": 0,
+    "failed": 14
+  },
+  "tracks": [
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\01. Ride.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\01. Ride.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:52.534902+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\01. Ride.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\01. Ride.flac: No such file or directory\r\n",
+      "elapsed_sec": 1.183
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\04. Run Your Mouth.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\04. Run Your Mouth.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:52.534902+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\04. Run Your Mouth.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\04. Run Your Mouth.flac: No such file or directory\r\n",
+      "elapsed_sec": 1.894
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\02. Hamptons.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\02. Hamptons.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:52.534902+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\02. Hamptons.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\02. Hamptons.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.188
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\03. Echo.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\03. Echo.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:52.534902+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\03. Echo.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\03. Echo.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.402
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\05. Real Life.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\05. Real Life.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:53.717790+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\05. Real Life.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\05. Real Life.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.326
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\06. Blur.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\06. Blur.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:54.429463+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\06. Blur.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\06. Blur.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.549
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\08. Lejos de Ti.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\08. Lejos de Ti.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:54.937442+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\08. Lejos de Ti.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\08. Lejos de Ti.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.129
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\07. Paranoia.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\07. Paranoia.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:54.723101+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\07. Paranoia.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\07. Paranoia.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.641
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\09. Love You Anyway.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\09. Love You Anyway.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:56.044213+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\09. Love You Anyway.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\09. Love You Anyway.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.68
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\10. Ay No Puedo.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\10. Ay No Puedo.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:56.978533+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\10. Ay No Puedo.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\10. Ay No Puedo.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.148
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\12. Vicious Sensitive Robot.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\12. Vicious Sensitive Robot.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:57.364359+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\12. Vicious Sensitive Robot.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\12. Vicious Sensitive Robot.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.305
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\11. No One Noticed.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\11. No One Noticed.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:57.066638+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\11. No One Noticed.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\11. No One Noticed.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.701
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\13. If Only.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\13. If Only.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:58.725247+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\13. If Only.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\13. If Only.flac: No such file or directory\r\n",
+      "elapsed_sec": 1.787
+    },
+    {
+      "src": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\14. Sienna.flac",
+      "src_codec": "flac",
+      "target": "C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\14. Sienna.mp3",
+      "action": "encode",
+      "art": {
+        "kind": "embedded",
+        "detail": "embedded:0:1 (png 1400x1400)"
+      },
+      "started_utc": "2025-10-07T20:04:59.126968+00:00",
+      "result": "failed",
+      "error": "ffprobe failed: ffprobe -v error -select_streams a:0 -show_entries stream=bit_rate,sample_rate,channels -of json 'C:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\14. Sienna.flac'\nC:\\Users\\nsukh\\OneDrive\\Desktop\\Projects\\ipod-format\\input_samples\\AlbumA\\14. Sienna.flac: No such file or directory\r\n",
+      "elapsed_sec": 2.483
+    }
+  ]
+}

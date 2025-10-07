@@ -1,0 +1,32 @@
+[encoding]
+format = "mp3"
+profile = "CBR320"      # maps to -c:a libmp3lame -b:a 320k
+sample_rate = "44100"   # force 44.1 kHz
+
+[id3]
+version = "2.3"
+strip_frames = ["TXXX:iTunNORM", "PRIV", "COMM:.*"]  # keep comments only if you want; default: drop vendor cruft
+
+[artwork]
+target_px = 500
+format = "png"
+mode = "center_crop"    # alternatives later: pad
+single_image_only = true
+
+[replace_in_place]
+enabled = true          # create .mp3 beside source, then delete source
+delete_mode = "trash"   # "trash" (safe) or "hard"; default is "trash" for sanity
+require_success_checks = true
+
+[collision]
+if_target_exists = "overwrite" # or "skip" | "version"
+
+[validation]
+min_duration_sec = 10   # fail very short or corrupted files
+verify_cover = true
+verify_id3_v23 = true
+
+[logging]
+level = "info"
+per_run_log = true
+write_manifest = true   # JSON summary per folder
