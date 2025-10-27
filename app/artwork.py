@@ -110,14 +110,14 @@ def extract_art_to_file(plan: TrackPlan, settings: Settings, art: ArtSource) -> 
     return None
 
 
-def normalize_art_to_png_500(plan: TrackPlan, settings: Settings, src_image: Optional[Path]) -> Optional[Path]:
+def normalize_art_to_jpeg_500(plan: TrackPlan, settings: Settings, src_image: Optional[Path]) -> Optional[Path]:
     """
-    Convert/crop the src image to a 500x500 PNG (center-crop by default).
-    Returns the normalized PNG path or None.
+    Convert/crop the src image to a 500x500 JPEG (center-crop by default).
+    Returns the normalized JPEG path or None.
     """
     if not src_image or not src_image.exists():
         return None
-    out_png = _temp_art_path(plan, ".cover_500.png")
+    out_jpeg = _temp_art_path(plan, ".cover_500.jpg")
 
     vf = (
         f"scale={settings.art_target_px}:{settings.art_target_px}:force_original_aspect_ratio=increase,"
@@ -133,7 +133,7 @@ def normalize_art_to_png_500(plan: TrackPlan, settings: Settings, src_image: Opt
             "-y",
             "-i", str(src_image),
             "-vf", vf,
-            str(out_png),
+            str(out_jpeg),
         ],
     )
-    return out_png
+    return out_jpeg

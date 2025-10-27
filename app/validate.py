@@ -65,11 +65,11 @@ def validate_id3_and_apic_500(dst: Path) -> None:
         raise ValueError(
             "More than one APIC found; expected a single front cover")
 
-    # Check PNG 500x500
+    # Check JPEG 500x500
     pic = apics[0].data
     im = Image.open(BytesIO(pic))
     im.load()
-    if im.format != "PNG":
-        raise ValueError(f"APIC is not PNG (got {im.format})")
+    if im.format != "JPEG":
+        raise ValueError(f"APIC is not JPEG (got {im.format})")
     if im.size != (500, 500):
         raise ValueError(f"APIC size is {im.size}, expected (500, 500)")

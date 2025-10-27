@@ -12,7 +12,7 @@ from typing import Any, Dict, Sequence
 from .config import load_settings
 from .errors import IpodPrepError
 from .planner import build_run_plan
-from .artwork import detect_art_source, extract_art_to_file, normalize_art_to_jpeg_500
+from .artwork import detect_art_source, extract_art_to_file, normalize_art_to_png_500
 from .transcode import encode_to_temp, copy_mp3_to_temp
 from .tagging import read_source_tags, write_id3_v23_with_apic
 from .validate import (
@@ -50,26 +50,26 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 
 def _print_plan(rows, settings) -> None:
     """
-    rows: iterable of (plan, art, src_image, jpeg500)
+    rows: iterable of (plan, art, src_image, png500)
     """
     print("\nPlan Preview (with artwork):")
     print("-" * 130)
-    print(f"{'Source':60}  {'Codec':6}  {'Action':22}  {'Art Source':28}  {'JPEG500?':8}  {'Target'}")
+    print(f"{'Source':60}  {'Codec':6}  {'Action':22}  {'Art Source':28}  {'PNG500?':8}  {'Target'}")
     print("-" * 130)
-    for (plan, art, _src_image, jpeg500) in rows:
+    for (plan, art, _src_image, png500) in rows:
         action = "copy (mp3)" if not plan.needs_encode else "encode → mp3 320/44.1"
         art_label = f"{art.kind}"
         if getattr(art, "detail", ""):
             art_label += f" [{art.detail}]"
-        jpeg_ok = "yes" if (jpeg500 and Path(jpeg500).exists()) else "no"
-        print(f"{str(plan.src):60.60}  {plan.src_codec:6}  {action:22}  {art_label:28.28}  {jpeg_ok:8}  {plan.target.name}")
+        png_ok = "yes" if (png500 and Path(png500).exists()) else "no"
+        print(f"{str(plan.src):60.60}  {plan.src_codec:6}  {action:22}  {art_label:28.28}  {png_ok:8}  {plan.target.name}")
     print("-" * 130)
     print(f"Total files: {len(rows)}")
     print(
         f"Replace-in-place: {'OFF' if not settings.replace_in_place else 'ON'} (delete mode: {settings.delete_mode})")
     print(
         f"Sample rate: {settings.sample_rate} | Bitrate: {settings.bitrate_mode} | ID3: v{settings.id3_version}")
-    print("Artwork: 500x500 JPEG (single image)")
+    print("Artwork: 500x500 PNG (single image)")
 
 
 def _probe_audio_meta(ffmpeg_path: str, path: Path) -> Dict[str, Any]:
@@ -119,7 +119,7 @@ def _probe_audio_meta(ffmpeg_path: str, path: Path) -> Dict[str, Any]:
     return out
 
 
-def process_one(plan, art, src_image, jpeg500, settings):
+def process_one(plan, art, src_image, png500, settings):
     """
     Run the full pipeline for a single track.
     Returns (plan, success: bool, message: str, manifest_row: dict).
@@ -148,7 +148,7 @@ def process_one(plan, art, src_image, jpeg500, settings):
 
         # TAGS
         src_tags = read_source_tags(plan.src)
-        write_id3_v23_with_apic(plan.temp_path, jpeg500,
+        write_id3_v23_with_apic(plan.temp_path, png500,
                                 src_tags, settings.strip_frames)
 
         # VALIDATION
@@ -173,7 +173,7 @@ def process_one(plan, art, src_image, jpeg500, settings):
                 deleted = True
 
         # CLEANUP temp art
-        cleanup_paths([p for p in (src_image, jpeg500) if p])
+        cleanup_paths([p for p in (src_image, png500) if p])
 
         # Probe destination AFTER commit
         meta_dst = _probe_audio_meta(settings.ffmpeg_path, final_target)
@@ -184,7 +184,7 @@ def process_one(plan, art, src_image, jpeg500, settings):
             "deleted_source": deleted,
             "elapsed_sec": round(dt, 3),
             "dst_meta": meta_dst,
-            "apic": {"jpeg_500": bool(jpeg500)},
+            "apic": {"png_500": bool(png500)},
         })
         return plan, True, f"✓ {final_target.name}", manifest_row
 
@@ -195,7 +195,7 @@ def process_one(plan, art, src_image, jpeg500, settings):
                 plan.temp_path.unlink()
         except Exception:
             pass
-        cleanup_paths([p for p in (src_image, jpeg500) if p])
+        cleanup_paths([p for p in (src_image, png500) if p])
 
         dt = time.perf_counter() - t0
         manifest_row.update({
@@ -227,13 +227,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         input_paths = [Path(p) for p in ns.paths]
         base_plans = build_run_plan(input_paths, settings)
 
-        # Detect artwork + prepare normalized JPEG for each plan
+        # Detect artwork + prepare normalized PNG for each plan
         rows = []
         for plan in base_plans:
             art = detect_art_source(plan, settings)
             src_image = extract_art_to_file(plan, settings, art)
-            jpeg500 = normalize_art_to_jpeg_500(plan, settings, src_image)
-            rows.append((plan, art, src_image, jpeg500))
+            png500 = normalize_art_to_png_500(plan, settings, src_image)
+            rows.append((plan, art, src_image, png500))
 
         # Prepare run directory (even for dry-run to keep things consistent)
         run_dir = make_run_dir()
@@ -243,7 +243,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_plan(rows, settings)
             # Clean up any temp art created during dry-run
             cleanup_paths([p for _plan, _art, src_img,
-                          jpeg in rows for p in (src_img, jpeg) if p])
+                          png in rows for p in (src_img, png) if p])
 
             manifest = {
                 "run_started_utc": run_start.isoformat(),
@@ -271,8 +271,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         t0 = time.perf_counter()
         with ThreadPoolExecutor(max_workers=jobs) as exe:
-            futs = [exe.submit(process_one, plan, art, src_image, jpeg500, settings)
-                    for (plan, art, src_image, jpeg500) in rows]
+            futs = [exe.submit(process_one, plan, art, src_image, png500, settings)
+                    for (plan, art, src_image, png500) in rows]
 
             for fut in as_completed(futs):
                 plan, ok, msg, row = fut.result()

@@ -24,7 +24,7 @@ strip_frames = ["TXXX:iTunNORM", "PRIV"]
 
 [artwork]
 target_px = 500
-format = "png"
+format = "jpeg"
 mode = "center_crop"
 single_image_only = true
 
@@ -80,9 +80,9 @@ def _coerce_settings(raw: dict[str, Any]) -> Settings:
     if art_px <= 0:
         raise ConfigError("artwork.target_px must be > 0")
 
-    art_format = get(["artwork", "format"], "png")
-    if art_format != "png":
-        raise ConfigError("artwork.format must be 'png' in v1.")
+    art_format = get(["artwork", "format"], "jpeg")
+    if art_format not in ("png", "jpeg"):
+        raise ConfigError("artwork.format must be 'png' or 'jpeg' in v1.")
 
     art_mode = get(["artwork", "mode"], "center_crop")
     if art_mode not in ("center_crop", "pad"):
@@ -123,7 +123,7 @@ def _coerce_settings(raw: dict[str, Any]) -> Settings:
         id3_version="2.3",
         strip_frames=strip_frames,
         art_target_px=art_px,
-        art_format="png",
+        art_format=art_format,  # type: ignore[arg-type]
         art_mode=art_mode,  # type: ignore[arg-type]
         single_image_only=single_image_only,
         replace_in_place=replace_enabled,

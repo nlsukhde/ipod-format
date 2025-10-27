@@ -118,18 +118,18 @@ def _strip_frames(tags: ID3, patterns: tuple[str, ...]) -> None:
             pass
 
 
-def _load_png_bytes(png_path: Path) -> bytes:
-    with png_path.open("rb") as fh:
+def _load_jpeg_bytes(jpeg_path: Path) -> bytes:
+    with jpeg_path.open("rb") as fh:
         data = fh.read()
-    # sanity: confirm it's 500x500 PNG
+    # sanity: confirm it's 500x500 JPEG
     im = Image.open(BytesIO(data))
     im.load()
     if im.size != (500, 500):
-        raise ValueError(f"APIC PNG not 500x500, got {im.size}")
+        raise ValueError(f"APIC JPEG not 500x500, got {im.size}")
     return data
 
 
-def write_id3_v23_with_apic(temp_mp3: Path, png500: Optional[Path], src_tags: dict, strip_patterns: tuple[str, ...]) -> None:
+def write_id3_v23_with_apic(temp_mp3: Path, jpeg500: Optional[Path], src_tags: dict, strip_patterns: tuple[str, ...]) -> None:
     """
     Overwrite temp_mp3's ID3 tags with v2.3 frames and a single Front Cover APIC.
     """
@@ -168,11 +168,11 @@ def write_id3_v23_with_apic(temp_mp3: Path, png500: Optional[Path], src_tags: di
 
     # Single APIC only
     tags.delall("APIC")
-    if png500 and png500.exists():
-        pic = _load_png_bytes(png500)
+    if jpeg500 and jpeg500.exists():
+        pic = _load_jpeg_bytes(jpeg500)
         tags.add(APIC(
             encoding=Encoding.UTF8,
-            mime="image/png",
+            mime="image/jpeg",
             type=3,  # front cover
             desc="Cover (front)",
             data=pic,

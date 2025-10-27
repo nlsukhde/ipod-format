@@ -9,7 +9,7 @@ strip_frames = ["TXXX:iTunNORM", "PRIV", "COMM:.*"]  # keep comments only if you
 
 [artwork]
 target_px = 500
-format = "png"
+format = "jpeg"
 mode = "center_crop"    # alternatives later: pad
 single_image_only = true
 

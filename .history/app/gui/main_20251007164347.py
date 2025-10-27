@@ -1,0 +1,378 @@
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from typing import Iterable, List, Set
+
+from PySide6 import QtCore, QtGui, QtWidgets
+
+from .workers import Runner
+
+
+AUDIO_EXTS = {
+    ".flac", ".alac", ".wav", ".aiff", ".aif", ".m4a", ".aac",
+    ".mp3", ".ogg", ".oga", ".opus", ".wma"
+}
+
+
+class DropList(QtWidgets.QListWidget):
+    filesDropped = QtCore.Signal(list)  # List[str]
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # Accept drops on both the widget and the viewport (where events actually arrive)
+        self.setAcceptDrops(True)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.setAlternatingRowColors(True)
+        self.setDragDropMode(
+            QtWidgets.QAbstractItemView.NoDragDrop)  # no internal DnD
+
+        # Placeholder overlay
+        self._placeholder = QtWidgets.QLabel(
+            "Drop album folders or audio files here…", self)
+        self._placeholder.setAlignment(QtCore.Qt.AlignCenter)
+        self._placeholder.setStyleSheet(
+            "color: palette(mid); font-style: italic;")
+        self._placeholder.setAttribute(
+            QtCore.Qt.WA_TransparentForMouseEvents, True)
+        self._update_placeholder()
+
+        # Track row changes to toggle placeholder
+        m = self.model()
+        m.rowsInserted.connect(self._on_model_rows_changed)
+        m.rowsRemoved.connect(self._on_model_rows_changed)
+
+        # Handle drag events at the viewport level
+        self.viewport().installEventFilter(self)
+
+    # --- Placeholder handling ---
+    def _on_model_rows_changed(self, *args) -> None:
+        self._update_placeholder()
+
+    def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(e)
+        self._placeholder.setGeometry(self.rect())
+
+    def _update_placeholder(self) -> None:
+        self._placeholder.setVisible(self.count() == 0)
+
+    # --- Accept regular drag/drop on the widget (works in some builds) ---
+    def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
+        if e.mimeData().hasUrls():
+            e.setDropAction(QtCore.Qt.CopyAction)
+            e.acceptProposedAction()
+        else:
+            e.ignore()
+
+    def dragMoveEvent(self, e: QtGui.QDragMoveEvent) -> None:
+        if e.mimeData().hasUrls():
+            e.setDropAction(QtCore.Qt.CopyAction)
+            e.acceptProposedAction()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e: QtGui.QDropEvent) -> None:
+        urls = e.mimeData().urls()
+        paths = [u.toLocalFile() for u in urls if u.isLocalFile()]
+        if paths:
+            self.filesDropped.emit(paths)
+            e.setDropAction(QtCore.Qt.CopyAction)
+            e.acceptProposedAction()
+        else:
+            e.ignore()
+
+    # --- Robust path: handle events that actually hit the viewport ---
+    def eventFilter(self, obj, event):
+        if obj is self.viewport():
+            et = event.type()
+            if et in (QtCore.QEvent.DragEnter, QtCore.QEvent.DragMove):
+                md = event.mimeData()
+                if md and md.hasUrls() and any(u.isLocalFile() for u in md.urls()):
+                    event.setDropAction(QtCore.Qt.CopyAction)
+                    event.acceptProposedAction()
+                    return True
+            elif et == QtCore.QEvent.Drop:
+                md = event.mimeData()
+                if md and md.hasUrls():
+                    paths = [u.toLocalFile()
+                             for u in md.urls() if u.isLocalFile()]
+                    if paths:
+                        self.filesDropped.emit(paths)
+                        event.setDropAction(QtCore.Qt.CopyAction)
+                        event.acceptProposedAction()
+                        return True
+        return super().eventFilter(obj, event)
+
+
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("iPod Format — GUI")
+        self.resize(1000, 640)
+
+        # central layout
+        central = QtWidgets.QWidget()
+        root = QtWidgets.QHBoxLayout(central)
+        root.setContentsMargins(12, 12, 12, 12)
+        root.setSpacing(12)
+
+        # left: queue list
+        self.list = DropList()
+        self.list.filesDropped.connect(self._on_files_dropped)
+        root.addWidget(self.list, 2)
+
+        # right: options panel
+        opts_panel = QtWidgets.QWidget()
+        opts = QtWidgets.QVBoxLayout(opts_panel)
+        opts.setSpacing(10)
+
+        # Replace in place
+        self.chk_replace = QtWidgets.QCheckBox(
+            "Replace in place (trash originals for non-MP3)")
+        self.chk_replace.setChecked(True)
+        opts.addWidget(self.chk_replace)
+
+        # Hard delete
+        self.chk_hard_delete = QtWidgets.QCheckBox(
+            "Hard delete (no Recycle Bin)")
+        self.chk_hard_delete.setChecked(False)
+        self.chk_hard_delete.setToolTip(
+            "If enabled, originals are permanently deleted for non-MP3 sources.")
+        opts.addWidget(self.chk_hard_delete)
+
+        # Jobs
+        jobs_row = QtWidgets.QHBoxLayout()
+        jobs_row.addWidget(QtWidgets.QLabel("Parallel jobs:"))
+        self.spin_jobs = QtWidgets.QSpinBox()
+        self.spin_jobs.setRange(1, max(1, (os.cpu_count() or 4)))
+        self.spin_jobs.setValue(min(4, os.cpu_count() or 2))
+        jobs_row.addWidget(self.spin_jobs, 1)
+        jobs_row.addStretch(1)
+        opts.addLayout(jobs_row)
+
+        # Buttons
+        btn_row = QtWidgets.QHBoxLayout()
+        self.btn_add = QtWidgets.QPushButton("Add…")
+        self.btn_add.clicked.connect(self._on_add_clicked)
+        self.btn_clear = QtWidgets.QPushButton("Clear")
+        self.btn_clear.clicked.connect(self._on_clear_clicked)
+        self.btn_preview = QtWidgets.QPushButton("Preview Plan")
+        self.btn_start = QtWidgets.QPushButton("Start")
+        self.btn_preview.clicked.connect(self._on_preview_clicked)
+        self.btn_start.clicked.connect(self._on_start_clicked)
+        btn_row.addWidget(self.btn_add)
+        btn_row.addWidget(self.btn_clear)
+        btn_row.addStretch(1)
+        btn_row.addWidget(self.btn_preview)
+        btn_row.addWidget(self.btn_start)
+        opts.addLayout(btn_row)
+
+        # Progress bar
+        self.progress = QtWidgets.QProgressBar()
+        self.progress.setVisible(False)
+        opts.addWidget(self.progress)
+
+        # Log area
+        self.txt_log = QtWidgets.QPlainTextEdit()
+        self.txt_log.setReadOnly(True)
+        self.txt_log.setPlaceholderText("Logs will appear here…")
+        self.txt_log.setMinimumWidth(360)
+        opts.addWidget(self.txt_log, 1)
+
+        root.addWidget(opts_panel, 1)
+        self.setCentralWidget(central)
+
+        # Status bar
+        self.statusBar().showMessage("Drop album folders or audio files to begin.")
+
+        # internal model
+        self._queue: List[Path] = []
+        self._queue_set: Set[str] = set()
+
+        # worker thread + runner
+        self._thread: QtCore.QThread | None = None
+        self._runner: Runner | None = None
+
+        self._update_buttons()
+
+    # ---------- worker plumbing ----------
+
+    def _ensure_worker(self):
+        if self._runner is not None:
+            return
+        self._thread = QtCore.QThread(self)
+        self._runner = Runner()
+        self._runner.moveToThread(self._thread)
+
+        # Signals → GUI
+        self._runner.log.connect(self._append_log)
+        self._runner.planReady.connect(self._on_plan_ready)
+        self._runner.started.connect(self._on_started)
+        self._runner.tick.connect(self._on_tick)
+        self._runner.trackResult.connect(self._on_track_result)
+        self._runner.finished.connect(self._on_finished)
+
+        self._thread.start()
+
+    def _teardown_worker(self):
+        if self._thread:
+            self._thread.quit()
+            self._thread.wait()
+        self._thread = None
+        self._runner = None
+
+    # ---------- queue management ----------
+
+    def _normalize_paths(self, paths: Iterable[str]) -> list[Path]:
+        normed: list[Path] = []
+        for p in paths:
+            try:
+                path = Path(p).resolve()
+            except Exception:
+                continue
+            if not path.exists():
+                continue
+            if path.is_dir() or path.suffix.lower() in AUDIO_EXTS:
+                normed.append(path)
+        return normed
+
+    def _add_to_queue(self, items: Iterable[Path]) -> None:
+        added = 0
+        for p in items:
+            key = str(p)
+            if key in self._queue_set:
+                continue
+            self._queue.append(p)
+            self._queue_set.add(key)
+            item = QtWidgets.QListWidgetItem(key)
+            icon = self.style().standardIcon(
+                QtWidgets.QStyle.SP_DirIcon if p.is_dir() else QtWidgets.QStyle.SP_FileIcon
+            )
+            item.setIcon(icon)
+            self.list.addItem(item)
+            added += 1
+        if added:
+            self.statusBar().showMessage(
+                f"Queued {added} item(s). Total: {len(self._queue)}")
+        self._update_buttons()
+
+    def _clear_all(self) -> None:
+        self.list.clear()
+        self._queue.clear()
+        self._queue_set.clear()
+        self._update_buttons()
+
+    def _update_buttons(self) -> None:
+        has_items = len(self._queue) > 0
+        running = self.progress.isVisible()
+        self.btn_start.setEnabled(has_items and not running)
+        self.btn_preview.setEnabled(has_items and not running)
+        self.btn_clear.setEnabled(has_items and not running)
+        self.list._update_placeholder()
+
+    # ---------- UI handlers ----------
+
+    @QtCore.Slot()
+    def _on_add_clicked(self) -> None:
+        dlg = QtWidgets.QFileDialog(
+            self, "Select album folders or audio files")
+        dlg.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
+        dlg.setOption(QtWidgets.QFileDialog.DontUseNativeDialog, False)
+        dlg.setNameFilter("Audio or folders (*.*)")
+        if dlg.exec():
+            self._add_to_queue(self._normalize_paths(dlg.selectedFiles()))
+
+    @QtCore.Slot()
+    def _on_clear_clicked(self) -> None:
+        self._clear_all()
+
+    @QtCore.Slot(list)
+    def _on_files_dropped(self, paths: list[str]) -> None:
+        self._add_to_queue(self._normalize_paths(paths))
+
+    @QtCore.Slot()
+    def _on_preview_clicked(self) -> None:
+        if not self._queue:
+            return
+        self._ensure_worker()
+        paths = [str(p) for p in self._queue]
+        opts = self.collect_options()
+        # queued call into worker thread
+        QtCore.QMetaObject.invokeMethod(
+            self._runner, "doPreview", QtCore.Qt.QueuedConnection,
+            QtCore.Q_ARG(object, paths), QtCore.Q_ARG(object, opts)
+        )
+
+    @QtCore.Slot()
+    def _on_start_clicked(self) -> None:
+        if not self._queue:
+            return
+        self._ensure_worker()
+        self.progress.setVisible(True)
+        self.progress.setRange(0, 1)
+        self.progress.setValue(0)
+        self._update_buttons()
+        paths = [str(p) for p in self._queue]
+        opts = self.collect_options()
+        QtCore.QMetaObject.invokeMethod(
+            self._runner, "doRun", QtCore.Qt.QueuedConnection,
+            QtCore.Q_ARG(object, paths), QtCore.Q_ARG(object, opts)
+        )
+
+    # ---------- worker signal handlers ----------
+
+    @QtCore.Slot(str, int)
+    def _on_plan_ready(self, plan_text: str, total: int) -> None:
+        self.txt_log.clear()
+        self.txt_log.appendPlainText(plan_text)
+        self.statusBar().showMessage(f"Planned {total} track(s).")
+
+    @QtCore.Slot(int)
+    def _on_started(self, total: int) -> None:
+        self.progress.setVisible(True)
+        self.progress.setRange(0, total if total > 0 else 1)
+        self.progress.setValue(0)
+        self.statusBar().showMessage(f"Processing {total} track(s)…")
+        self._update_buttons()
+
+    @QtCore.Slot(int, int)
+    def _on_tick(self, done: int, total: int) -> None:
+        self.progress.setMaximum(total if total > 0 else 1)
+        self.progress.setValue(done)
+
+    @QtCore.Slot(str, bool, str)
+    def _on_track_result(self, basename: str, ok: bool, msg: str) -> None:
+        self.txt_log.appendPlainText(f"→ {basename}: {msg}")
+
+    @QtCore.Slot(int, int)
+    def _on_finished(self, ok_count: int, fail_count: int) -> None:
+        self.statusBar().showMessage(
+            f"Done — {ok_count} ok / {fail_count} failed.")
+        self.progress.setVisible(False)
+        self._update_buttons()
+        # keep worker alive for subsequent runs
+
+    @QtCore.Slot(str)
+    def _append_log(self, line: str) -> None:
+        self.txt_log.appendPlainText(line)
+
+    # ---------- options for pipeline ----------
+
+    def collect_options(self) -> dict:
+        return {
+            "replace_in_place": self.chk_replace.isChecked(),
+            "hard_delete": self.chk_hard_delete.isChecked(),
+            "jobs": int(self.spin_jobs.value()),
+        }
+
+    def get_queue(self) -> list[Path]:
+        return list(self._queue)
+
+
+def main() -> int:
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    w = MainWindow()
+    w.show()
+    return app.exec()
